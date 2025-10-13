@@ -1,4 +1,4 @@
-package ui
+package blocks
 
 import (
 	"com.yvka.memcard/pkg/memcard"
@@ -13,16 +13,16 @@ type BlockSelector interface {
 }
 type BlockContainer struct {
 	widget.BaseWidget
-	blocks               []*blockElement
+	blocks               []*blockView
 	selectedBlockIndexes []int
 }
 
-func NewBlockContainer(cardId int) *BlockContainer {
+func NewBlockContainer(cardId memcard.MemoryCardID) *BlockContainer {
 	bc := &BlockContainer{}
 	bc.ExtendBaseWidget(bc)
 
 	for i := 0; i < 15; i++ {
-		block := NewBlock(i, cardId, bc)
+		block := NewBlockView(i, cardId, bc)
 		bc.blocks = append(bc.blocks, block)
 	}
 

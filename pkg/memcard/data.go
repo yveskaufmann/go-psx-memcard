@@ -1,5 +1,12 @@
 package memcard
 
+type MemoryCardID string
+
+const (
+	MemoryCardLeft  MemoryCardID = "Card-1"
+	MemoryCardRight MemoryCardID = "Card-2"
+)
+
 type IconDisplayFlag byte
 
 const (
