@@ -16,20 +16,17 @@ type ManagerWindowView struct {
 }
 
 func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
+	model := NewManagerWindowViewModel(window)
 	view := &ManagerWindowView{
-		model: &ManagerWindowViewModel{
-			window: window,
-		},
+		model: model,
 	}
 
 	rootLayout := container.NewVBox()
 
-	rootLayout.Add(widget.NewLabel("Select a memory card file to begin."))
-
-	leftMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardLeft)
+	leftMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardLeft, model.blocksLeft)
 	leftMemoryCardFilePicker := filepicker.NewFilePicker(&window)
 	leftMemoryCardFilePicker.SetOnChanged(func(filePath string) {
-		view.model.LoadMemoryCardImage(filePath, memcard.MemoryCardLeft)
+		model.LoadMemoryCardImage(filePath, memcard.MemoryCardLeft)
 	})
 
 	leftMemcardContainer := container.NewVBox(
@@ -38,10 +35,10 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 		leftMemoryCardView,
 	)
 
-	rightMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardRight)
+	rightMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardRight, model.blocksRight)
 	rightMemoryCardFilePicker := filepicker.NewFilePicker(&window)
 	rightMemoryCardFilePicker.SetOnChanged(func(filePath string) {
-		view.model.LoadMemoryCardImage(filePath, memcard.MemoryCardRight)
+		model.LoadMemoryCardImage(filePath, memcard.MemoryCardRight)
 	})
 
 	rightMemoryCardContainer := container.NewVBox(
@@ -52,15 +49,15 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 
 	buttons := container.NewVBox()
 	btnCopy := widget.NewButton("Copy", func() {
-		view.model.CopyCommand(memcard.MemoryCardLeft, view.model.SelectedBlockIndex())
+		model.CopyCommand(memcard.MemoryCardLeft, model.SelectedBlockIndex())
 	})
 
 	btnCopyAll := widget.NewButton("Copy All", func() {
-		view.model.CopyAllCommand(memcard.MemoryCardLeft)
+		model.CopyAllCommand(memcard.MemoryCardLeft)
 	})
 
 	btnDelete := widget.NewButton("Delete", func() {
-		view.model.DeleteCommand(memcard.MemoryCardRight, view.model.SelectedBlockIndex())
+		model.DeleteCommand(memcard.MemoryCardRight, model.SelectedBlockIndex())
 	})
 
 	buttons.Add(layout.NewSpacer())

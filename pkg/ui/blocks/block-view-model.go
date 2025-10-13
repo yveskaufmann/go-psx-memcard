@@ -25,7 +25,7 @@ func NewBlockModelView(idx int, cardId memcard.MemoryCardID, blockSelector Block
 		blockSelector: blockSelector,
 		Allocated:     binding.NewBool(),
 		GameTitle:     nil,
-		Icon:          nil,
+		Icon:          binding.NewItem((func(a, b image.Image) bool { return a == b })),
 	}
 }
 

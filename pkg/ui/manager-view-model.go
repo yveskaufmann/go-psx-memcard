@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"com.yvka.memcard/pkg/memcard"
+	_ui_blocks "com.yvka.memcard/pkg/ui/blocks"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
@@ -17,6 +19,16 @@ type ManagerWindowViewModel struct {
 
 	blocksLeft  binding.UntypedList
 	blocksRight binding.UntypedList
+}
+
+func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
+	return &ManagerWindowViewModel{
+		window:             window,
+		selectedBlockIndex: binding.NewInt(),
+		selectedCardId:     binding.NewString(),
+		blocksLeft:         binding.NewUntypedList(),
+		blocksRight:        binding.NewUntypedList(),
+	}
 }
 
 func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId memcard.MemoryCardID) {
@@ -34,14 +46,27 @@ func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId 
 		return
 	}
 
-	vm.blocksLeft = binding.NewUntypedList()
-	vm.blocksRight = binding.NewUntypedList()
-
-	for idx, block := range blocks {
-		leftMemoryCardView.SetBlockItem(idx, block)
-
+	var blockBindingList binding.UntypedList
+	if memoryCardId == memcard.MemoryCardLeft {
+		blockBindingList = vm.blocksLeft
+	} else {
+		blockBindingList = vm.blocksRight
 	}
 
+	bindings := []any{}
+	for idx, block := range blocks {
+
+		blockItem := _ui_blocks.Item{
+			Index: idx,
+			Title: block.Title,
+			Icon:  block.Icon,
+			Used:  block.Title != "",
+		}
+
+		bindings = append(bindings, blockItem)
+	}
+
+	blockBindingList.Set(bindings)
 }
 
 func (vm *ManagerWindowViewModel) CopyCommand(source memcard.MemoryCardID, blockIndex int) {

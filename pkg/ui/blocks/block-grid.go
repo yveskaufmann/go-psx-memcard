@@ -1,9 +1,12 @@
 package blocks
 
 import (
+	"image"
+
 	"com.yvka.memcard/pkg/memcard"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -14,17 +17,24 @@ type BlockSelector interface {
 type BlockContainer struct {
 	widget.BaseWidget
 	blocks               []*blockView
+	blockBinding         binding.UntypedList
 	selectedBlockIndexes []int
 }
 
-func NewBlockContainer(cardId memcard.MemoryCardID) *BlockContainer {
-	bc := &BlockContainer{}
+func NewBlockContainer(cardId memcard.MemoryCardID, blockBinding binding.UntypedList) *BlockContainer {
+	bc := &BlockContainer{
+		blockBinding: blockBinding,
+	}
 	bc.ExtendBaseWidget(bc)
 
 	for i := 0; i < 15; i++ {
 		block := NewBlockView(i, cardId, bc)
 		bc.blocks = append(bc.blocks, block)
 	}
+
+	blockBinding.AddListener(binding.NewDataListener(func() {
+		bc.Refresh()
+	}))
 
 	return bc
 }
@@ -37,6 +47,49 @@ func (b *BlockContainer) CreateRenderer() fyne.WidgetRenderer {
 	}
 
 	return widget.NewSimpleRenderer(grid)
+}
+
+func (b *BlockContainer) Refresh() {
+	b.BaseWidget.Refresh()
+
+	// Update the block views based on the current state of the blocks list
+
+	for i := range len(b.blocks) {
+		b.blocks[i].Unselect()
+		b.blocks[i].model.Allocated.Set(false)
+		b.blocks[i].SetIcon(nil)
+	}
+
+	for i := 0; i < b.blockBinding.Length(); i++ {
+		item, err := b.blockBinding.GetItem(i)
+		if err != nil {
+			continue
+		}
+
+		blockItem, ok := item.(binding.Untyped)
+		if !ok {
+			continue
+		}
+
+		v, err := blockItem.Get()
+		if err != nil {
+			continue
+		}
+
+		block, ok := v.(Item)
+		if !ok {
+			continue
+		}
+
+		if blockItem != nil {
+			idx := block.Index
+			icon := block.Icon
+
+			b.blocks[idx].SetIcon(icon)
+			b.blocks[idx].model.Allocated.Set(true)
+
+		}
+	}
 }
 
 func (b *BlockContainer) SelectBlock(idx int) {
@@ -55,7 +108,7 @@ func (b *BlockContainer) SelectBlock(idx int) {
 	if block.Selected() {
 		return
 	}
-	block.Select()
+	// block.Select()
 	b.selectedBlockIndexes = []int{idx}
 
 }
@@ -93,4 +146,11 @@ func sliceFilter(s []int, test func(int) bool) (ret []int) {
 		}
 	}
 	return
+}
+
+type Item struct {
+	Index int
+	Title string
+	Icon  image.Image
+	Used  bool
 }

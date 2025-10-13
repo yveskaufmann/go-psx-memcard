@@ -14,27 +14,47 @@ import (
 
 var (
 	SELECTED_BORDER_COLOR   = color.RGBA{R: 200, G: 100, B: 100, A: 255}
-	UNSELECTED_BORDER_COLOR = color.Black
+	UNSELECTED_BORDER_COLOR = color.RGBA{R: 0, G: 0, B: 00, A: 60}
+	FILL_COLOR              = color.RGBA{R: 100, G: 100, B: 200, A: 255}
 	BLOCK_SIZE              = float32(64.0)
 )
 
 type blockView struct {
 	widget.BaseWidget
-	model     BlockModelView
-	container *fyne.Container
-	block     *canvas.Rectangle
-	icon      *canvas.Image
+	model         BlockModelView
+	container     *fyne.Container
+	block         *canvas.Rectangle
+	iconContainer *fyne.Container
 }
 
 func NewBlockView(idx int, cardId memcard.MemoryCardID, blockSelector BlockSelector) *blockView {
 
 	model := NewBlockModelView(idx, cardId, blockSelector)
 
-	block := canvas.NewRectangle(color.RGBA{R: 100, G: 100, B: 200, A: 255})
+	block := canvas.NewRectangle(FILL_COLOR)
 	block.StrokeColor = UNSELECTED_BORDER_COLOR
 	block.StrokeWidth = 2
 	block.SetMinSize(fyne.NewSize(BLOCK_SIZE, BLOCK_SIZE))
 	block.Resize(fyne.NewSize(BLOCK_SIZE, BLOCK_SIZE))
+
+	model.Allocated.AddListener(binding.NewDataListener(func() {
+		allocated, _ := model.Allocated.Get()
+		if allocated {
+			block.FillColor = color.RGBA{
+				R: FILL_COLOR.R,
+				G: FILL_COLOR.G,
+				B: FILL_COLOR.B,
+				A: 255,
+			}
+		} else {
+			block.FillColor = color.RGBA{
+				R: FILL_COLOR.R,
+				G: FILL_COLOR.G,
+				B: FILL_COLOR.B,
+				A: 0,
+			}
+		}
+	}))
 
 	blockLayout := container.NewStack(
 		block,
@@ -46,10 +66,10 @@ func NewBlockView(idx int, cardId memcard.MemoryCardID, blockSelector BlockSelec
 		block:     block,
 	}
 
+	bl.ExtendBaseWidget(bl)
+
 	bl.setupSelectedBinding()
 	bl.setupIconBinding()
-
-	bl.ExtendBaseWidget(bl)
 
 	return bl
 }
@@ -73,18 +93,20 @@ func (v *blockView) setupIconBinding() {
 		icon, _ := model.Icon.Get()
 
 		// Remove existing icon if icon binding is nil
-		if v.icon != nil && icon == nil {
-			v.container.Remove(v.icon)
-			v.icon = nil
-		}
-
-		if v.icon != nil {
-			v.icon = canvas.NewImageFromImage(icon)
-			v.container.Objects = append(v.container.Objects, v.icon)
+		if v.iconContainer != nil && icon == nil {
+			v.container.Remove(v.iconContainer)
+			v.iconContainer = nil
 		}
 
 		if icon != nil {
-			v.SetIcon(icon)
+			image := canvas.NewImageFromImage(icon)
+			if v.iconContainer != nil {
+				v.container.Remove(v.iconContainer)
+			}
+
+			v.iconContainer = container.NewPadded(image)
+
+			v.container.Add(v.iconContainer)
 		}
 
 		v.block.Refresh()
