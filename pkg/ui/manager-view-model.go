@@ -17,17 +17,20 @@ type ManagerWindowViewModel struct {
 	selectedBlockIndex binding.Int
 	selectedCardId     binding.String
 
+	selectedSaveGameTitle binding.String
+
 	blocksLeft  binding.UntypedList
 	blocksRight binding.UntypedList
 }
 
 func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
 	return &ManagerWindowViewModel{
-		window:             window,
-		selectedBlockIndex: binding.NewInt(),
-		selectedCardId:     binding.NewString(),
-		blocksLeft:         binding.NewUntypedList(),
-		blocksRight:        binding.NewUntypedList(),
+		window:                window,
+		selectedBlockIndex:    binding.NewInt(),
+		selectedCardId:        binding.NewString(),
+		blocksLeft:            binding.NewUntypedList(),
+		blocksRight:           binding.NewUntypedList(),
+		selectedSaveGameTitle: binding.NewString(),
 	}
 }
 
@@ -57,10 +60,10 @@ func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId 
 	for idx, block := range blocks {
 
 		blockItem := _ui_blocks.Item{
-			Index: idx,
-			Title: block.Title,
-			Icon:  block.Icon,
-			Used:  block.Title != "",
+			Index:     idx,
+			Title:     block.Title,
+			Animation: block.Animation,
+			Used:      block.Title != "",
 		}
 
 		bindings = append(bindings, blockItem)
@@ -98,4 +101,6 @@ func (vm *ManagerWindowViewModel) SelectedCard() memcard.MemoryCardID {
 func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.MemoryCardID, blockIndex int) {
 	vm.selectedCardId.Set(string(cardId))
 	vm.selectedBlockIndex.Set(blockIndex)
+
+	vm.selectedSaveGameTitle.Set(fmt.Sprintf("Selected: Card %s - Block %d", cardId, blockIndex))
 }

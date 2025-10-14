@@ -1,10 +1,11 @@
 package blocks
 
 import (
-	"image"
 	"image/color"
+	"reflect"
 
 	"com.yvka.memcard/pkg/memcard"
+	animatedsprite "com.yvka.memcard/pkg/ui/animated-sprite"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -69,7 +70,7 @@ func NewBlockView(idx int, cardId memcard.MemoryCardID, blockSelector BlockSelec
 	bl.ExtendBaseWidget(bl)
 
 	bl.setupSelectedBinding()
-	bl.setupIconBinding()
+	bl.setupIconAnimation()
 
 	return bl
 }
@@ -87,24 +88,24 @@ func (v *blockView) setupSelectedBinding() {
 	}))
 }
 
-func (v *blockView) setupIconBinding() {
+func (v *blockView) setupIconAnimation() {
 	model := v.model
-	model.Icon.AddListener(binding.NewDataListener(func() {
-		icon, _ := model.Icon.Get()
+	model.Animation.AddListener(binding.NewDataListener(func() {
+		animation, _ := model.Animation.Get()
 
 		// Remove existing icon if icon binding is nil
-		if v.iconContainer != nil && icon == nil {
+		if v.iconContainer != nil && reflect.ValueOf(animation).IsZero() {
 			v.container.Remove(v.iconContainer)
 			v.iconContainer = nil
 		}
 
-		if icon != nil {
-			image := canvas.NewImageFromImage(icon)
+		if !reflect.ValueOf(animation).IsZero() {
+			image := animatedsprite.NewAnimatedSprite(animation)
 			if v.iconContainer != nil {
 				v.container.Remove(v.iconContainer)
 			}
 
-			v.iconContainer = container.NewPadded(image)
+			v.iconContainer = container.NewPadded(&image.Image)
 
 			v.container.Add(v.iconContainer)
 		}
@@ -129,8 +130,8 @@ func (v *blockView) Tapped(ev *fyne.PointEvent) {
 	v.model.ToggleSelect()
 }
 
-func (v *blockView) SetIcon(image image.Image) {
-	v.model.Icon.Set(image)
+func (v *blockView) SetAnimation(animation animatedsprite.Animation) {
+	v.model.Animation.Set(animation)
 }
 
 func (v *blockView) CreateRenderer() fyne.WidgetRenderer {

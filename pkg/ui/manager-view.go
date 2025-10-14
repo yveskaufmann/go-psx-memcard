@@ -66,12 +66,18 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 	buttons.Add(btnDelete)
 	buttons.Add(layout.NewSpacer())
 
-	rootLayout.Add(container.NewHBox(
+	labelSelectedSaveGame := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{
+		Bold: true,
+	})
+
+	labelSelectedSaveGame.Bind(model.selectedSaveGameTitle)
+
+	rootLayout.Add(container.NewBorder(
+		nil,
+		labelSelectedSaveGame,
 		leftMemcardContainer,
-		layout.NewSpacer(),
-		buttons,
-		layout.NewSpacer(),
 		rightMemoryCardContainer,
+		buttons,
 	))
 
 	view.container = rootLayout

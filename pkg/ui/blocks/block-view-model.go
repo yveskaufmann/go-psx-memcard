@@ -1,9 +1,8 @@
 package blocks
 
 import (
-	"image"
-
 	"com.yvka.memcard/pkg/memcard"
+	animatedsprite "com.yvka.memcard/pkg/ui/animated-sprite"
 	"fyne.io/fyne/v2/data/binding"
 )
 
@@ -12,8 +11,8 @@ type BlockModelView struct {
 	CardId        memcard.MemoryCardID
 	Selected      binding.Bool
 	Allocated     binding.Bool
-	GameTitle     binding.String            // binding to string
-	Icon          binding.Item[image.Image] // binding to image.Image
+	GameTitle     binding.String                         // binding to string
+	Animation     binding.Item[animatedsprite.Animation] // binding to animatedsprite.Animation
 	blockSelector BlockSelector
 }
 
@@ -24,8 +23,8 @@ func NewBlockModelView(idx int, cardId memcard.MemoryCardID, blockSelector Block
 		Selected:      binding.NewBool(),
 		blockSelector: blockSelector,
 		Allocated:     binding.NewBool(),
-		GameTitle:     nil,
-		Icon:          binding.NewItem((func(a, b image.Image) bool { return a == b })),
+		GameTitle:     binding.NewString(),
+		Animation:     binding.NewItem((func(a, b animatedsprite.Animation) bool { return len(a.Frames) == len(b.Frames) })),
 	}
 }
 

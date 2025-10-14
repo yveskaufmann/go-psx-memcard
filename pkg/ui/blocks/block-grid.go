@@ -1,9 +1,8 @@
 package blocks
 
 import (
-	"image"
-
 	"com.yvka.memcard/pkg/memcard"
+	animatedsprite "com.yvka.memcard/pkg/ui/animated-sprite"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
@@ -57,7 +56,8 @@ func (b *BlockContainer) Refresh() {
 	for i := range len(b.blocks) {
 		b.blocks[i].Unselect()
 		b.blocks[i].model.Allocated.Set(false)
-		b.blocks[i].SetIcon(nil)
+		b.blocks[i].model.Animation.Set(animatedsprite.Animation{})
+		b.blocks[i].model.GameTitle.Set("")
 	}
 
 	for i := 0; i < b.blockBinding.Length(); i++ {
@@ -83,9 +83,9 @@ func (b *BlockContainer) Refresh() {
 
 		if blockItem != nil {
 			idx := block.Index
-			icon := block.Icon
+			animation := block.Animation
 
-			b.blocks[idx].SetIcon(icon)
+			b.blocks[idx].SetAnimation(animation)
 			b.blocks[idx].model.Allocated.Set(true)
 
 		}
@@ -108,7 +108,6 @@ func (b *BlockContainer) SelectBlock(idx int) {
 	if block.Selected() {
 		return
 	}
-	// block.Select()
 	b.selectedBlockIndexes = []int{idx}
 
 }
@@ -136,7 +135,7 @@ func (b *BlockContainer) SetBlockItem(idx int, item memcard.BlockItem) {
 	}
 
 	block := b.blocks[idx]
-	block.SetIcon(item.Icon)
+	block.SetAnimation(item.Animation)
 }
 
 func sliceFilter(s []int, test func(int) bool) (ret []int) {
@@ -149,8 +148,8 @@ func sliceFilter(s []int, test func(int) bool) (ret []int) {
 }
 
 type Item struct {
-	Index int
-	Title string
-	Icon  image.Image
-	Used  bool
+	Index     int
+	Title     string
+	Animation animatedsprite.Animation
+	Used      bool
 }

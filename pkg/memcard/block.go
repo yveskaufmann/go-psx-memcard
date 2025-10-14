@@ -3,6 +3,8 @@ package memcard
 import (
 	"errors"
 	"image"
+
+	animatedsprite "com.yvka.memcard/pkg/ui/animated-sprite"
 )
 
 var (
@@ -11,7 +13,7 @@ var (
 
 type BlockItem struct {
 	Title       string
-	Icon        image.Image
+	Animation   animatedsprite.Animation
 	BlockNumber uint8
 }
 
@@ -30,9 +32,31 @@ func (mc *MemoryCard) GetBlock(blockNumber int) (*BlockItem, error) {
 		return nil, nil // Block is free or deleted
 	}
 
+	frames := []image.Image{}
+	for idx, f := range block.IconFrames {
+
+		switch block.TitleFrame.IconDisplayFlag {
+		case IconDisplayFlagOneFrameIcon:
+			if idx > 0 {
+				continue
+			}
+		case IconDisplayFlagTwoFrameIcon:
+			if idx > 1 {
+				continue
+			}
+		case IconDisplayFlagThreeFrameIcon:
+			if idx > 2 {
+				continue
+			}
+
+		}
+		frames = append(frames, f.ToImage(block.TitleFrame.IconColorPalette))
+	}
+
 	item := &BlockItem{
-		Title:       block.TitleFrame.Title.String(),
-		Icon:        block.IconFrames[0].ToImage(block.TitleFrame.IconColorPalette),
+		Title:     block.TitleFrame.Title.String(),
+		Animation: animatedsprite.NewAnimation(frames),
+
 		BlockNumber: uint8(blockNumber),
 	}
 

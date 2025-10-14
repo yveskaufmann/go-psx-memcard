@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 )
 
@@ -11,7 +10,6 @@ func Start() error {
 
 	view := NewManagerWindowView(w)
 
-	w.Resize(fyne.NewSize(1024, 768))
 	w.SetContent(view.Container())
 	w.ShowAndRun()
 
