@@ -8,7 +8,7 @@ GOARCH := $(shell go env GOARCH)
 
 # Build the application
 build:
-	go build -o bin/$(BIN_NAME) ./cmd/psx-memcard.go
+	go build -o bin/$(BIN_NAME) main.go
 
 # Run unit tests
 test:
@@ -16,7 +16,7 @@ test:
 
 run:
 	@echo "Running Application..."
-	@go run ./cmd/psx-memcard.go
+	@go run ./main.go
 
 
 # Clean build artifacts

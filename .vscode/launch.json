@@ -9,7 +9,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "cmd/psx-memcard.go",
+      "program": "main.go",
       "cwd": "${workspaceFolder}",
       "internalConsoleOptions": "openOnFirstSessionStart"
     },
