@@ -4,7 +4,7 @@ import (
 	"errors"
 	"image"
 
-	animatedsprite "com.yv35.memcard/pkg/ui/animated-sprite"
+	animatedsprite "com.yv35.memcard/internal/ui/animated-sprite"
 )
 
 var (

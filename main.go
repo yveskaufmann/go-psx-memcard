@@ -1,6 +1,6 @@
 package main
 
-import "com.yv35.memcard/pkg/ui"
+import "com.yv35.memcard/internal/ui"
 
 func main() {
 	if err := ui.Start(); err != nil {

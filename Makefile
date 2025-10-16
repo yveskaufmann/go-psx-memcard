@@ -12,7 +12,7 @@ build:
 
 # Run unit tests
 test:
-	go test ./pkg/... -v
+	go test ./internal/... -v
 
 run:
 	@echo "Running Application..."
