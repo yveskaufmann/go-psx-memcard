@@ -7,7 +7,7 @@ import (
 )
 
 func newApp() fyne.App {
-	return app.NewWithID("com.github.yveskaufmann.psx-memcard-manager")
+	return app.NewWithID("com.yv35.PSXMemoryCardManager")
 }
 
 func newWindow(a fyne.App) fyne.Window {
