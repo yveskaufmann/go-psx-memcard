@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"com.yvka.memcard/pkg/dig"
+	"com.yv35.memcard/pkg/dig"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 )

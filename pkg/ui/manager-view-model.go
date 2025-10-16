@@ -3,8 +3,8 @@ package ui
 import (
 	"fmt"
 
-	"com.yvka.memcard/pkg/memcard"
-	_ui_blocks "com.yvka.memcard/pkg/ui/blocks"
+	"com.yv35.memcard/pkg/memcard"
+	_ui_blocks "com.yv35.memcard/pkg/ui/blocks"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/data/binding"

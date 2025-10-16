@@ -4,7 +4,7 @@ import (
 	"os"
 	"path"
 
-	"com.yvka.memcard/pkg/ui/utils"
+	"com.yv35.memcard/pkg/ui/utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"

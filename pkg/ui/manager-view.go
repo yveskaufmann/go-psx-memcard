@@ -1,9 +1,9 @@
 package ui
 
 import (
-	"com.yvka.memcard/pkg/memcard"
-	"com.yvka.memcard/pkg/ui/blocks"
-	"com.yvka.memcard/pkg/ui/filepicker"
+	"com.yv35.memcard/pkg/memcard"
+	"com.yv35.memcard/pkg/ui/blocks"
+	"com.yv35.memcard/pkg/ui/filepicker"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"

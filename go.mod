@@ -1,4 +1,4 @@
-module com.yvka.memcard
+module com.yv35.memcard
 
 go 1.24.0
 

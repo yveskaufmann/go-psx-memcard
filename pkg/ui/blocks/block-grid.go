@@ -1,8 +1,8 @@
 package blocks
 
 import (
-	"com.yvka.memcard/pkg/memcard"
-	animatedsprite "com.yvka.memcard/pkg/ui/animated-sprite"
+	"com.yv35.memcard/pkg/memcard"
+	animatedsprite "com.yv35.memcard/pkg/ui/animated-sprite"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
