@@ -27,7 +27,7 @@ type ManagerWindowViewModel struct {
 }
 
 func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
-	return &ManagerWindowViewModel{
+	win := &ManagerWindowViewModel{
 		window:                window,
 		selectedBlockIndex:    binding.NewInt(),
 		selectedCardId:        binding.NewString(),
@@ -35,6 +35,12 @@ func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
 		blocksRight:           binding.NewUntypedList(),
 		selectedSaveGameTitle: binding.NewString(),
 	}
+
+	win.selectedBlockIndex.Set(-1)
+	win.selectedCardId.Set("")
+	win.selectedSaveGameTitle.Set("")
+
+	return win
 }
 
 func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId memcard.MemoryCardID) {
@@ -137,8 +143,32 @@ func (vm *ManagerWindowViewModel) SelectedCard() memcard.MemoryCardID {
 }
 
 func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.MemoryCardID, blockIndex int) {
+	if blockIndex < 0 {
+		vm.selectedBlockIndex.Set(-1)
+		vm.selectedCardId.Set("")
+		vm.selectedSaveGameTitle.Set("")
+		return
+	}
+
 	vm.selectedCardId.Set(string(cardId))
 	vm.selectedBlockIndex.Set(blockIndex)
 
-	vm.selectedSaveGameTitle.Set(fmt.Sprintf("Selected: Card %s - Block %d", cardId, blockIndex))
+	card := vm.getMemoryCardById(cardId)
+	if card == nil {
+		vm.setDefaultSaveGameTitle(cardId, blockIndex)
+		return
+	}
+
+	blockItem, err := card.GetBlock(blockIndex)
+	if err != nil || blockItem == nil {
+		vm.setDefaultSaveGameTitle(cardId, blockIndex)
+		return
+	}
+
+	vm.selectedSaveGameTitle.Set(blockItem.Title)
+
+}
+
+func (vm *ManagerWindowViewModel) setDefaultSaveGameTitle(cardId memcard.MemoryCardID, blockIndex int) {
+	vm.selectedSaveGameTitle.Set(fmt.Sprintf("Card %s - Block %d", cardId, blockIndex))
 }
