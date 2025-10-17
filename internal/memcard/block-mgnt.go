@@ -5,7 +5,7 @@ func (mc *MemoryCard) CopyBlockTo(blockIndex int, targetCard *MemoryCard) error 
 	return nil
 }
 
-func (mc *MemoryCard) DeleteBlockFrom(blockIndex int, targetCard *MemoryCard) error {
+func (mc *MemoryCard) DeleteBlockFrom(blockIndex int) error {
 	// TODO: Implement block deletion logic
 	return nil
 }

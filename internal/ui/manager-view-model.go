@@ -77,28 +77,46 @@ func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId 
 	blockBindingList.Set(bindings)
 }
 
-func (vm *ManagerWindowViewModel) CopyCommand(source memcard.MemoryCardID, blockIndex int) {
-	var card *memcard.MemoryCard
-	if source == memcard.MemoryCardLeft {
-		card = vm.leftMemoryCard
-	} else {
-		card = vm.rightMemoryCard
+func (vm *ManagerWindowViewModel) getMemoryCardById(cardId memcard.MemoryCardID) *memcard.MemoryCard {
+	if cardId == memcard.MemoryCardLeft {
+		return vm.leftMemoryCard
+	}
+	return vm.rightMemoryCard
+}
+
+func (vm *ManagerWindowViewModel) CopyCommand(sourceCardId memcard.MemoryCardID, blockIndex int) error {
+	card := vm.getMemoryCardById(sourceCardId)
+
+	if blockIndex < 0 || blockIndex >= memcard.NumBlocks {
+		return fmt.Errorf("cannot copy block without selecting a block")
 	}
 
 	if card == nil {
-		dialog.ShowError(fmt.Errorf("no memory card loaded for card %s", source), vm.window)
-		return
+		return fmt.Errorf("cannot copy block without loading a memory card \"%s\"", sourceCardId)
 	}
 
 	if err := card.CopyBlockTo(blockIndex, card); err != nil {
-		dialog.ShowError(err, vm.window)
+		return err
 	}
+
+	return nil
 }
 
-func (vm *ManagerWindowViewModel) DeleteCommand(source *memcard.MemoryCard, blockIndex int) {
-	if err := source.DeleteBlockFrom(blockIndex, source); err != nil {
-		dialog.ShowError(err, vm.window)
+func (vm *ManagerWindowViewModel) DeleteCommand(sourceCardId memcard.MemoryCardID, blockIndex int) error {
+	card := vm.getMemoryCardById(sourceCardId)
+
+	if blockIndex < 0 || blockIndex >= memcard.NumBlocks {
+		return fmt.Errorf("cannot delete block without selecting a block")
 	}
+
+	if card == nil {
+		return fmt.Errorf("cannot delete block without loading a memory card \"%s\"", sourceCardId)
+	}
+
+	if err := card.DeleteBlockFrom(blockIndex); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (vm *ManagerWindowViewModel) SelectedBlockIndex() int {
