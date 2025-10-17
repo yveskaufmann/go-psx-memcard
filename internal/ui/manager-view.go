@@ -56,6 +56,10 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 		rightMemoryCardView,
 	)
 
+	// Set sibling containers so they can clear each other's selections
+	leftMemoryCardView.SetSiblingContainer(rightMemoryCardView)
+	rightMemoryCardView.SetSiblingContainer(leftMemoryCardView)
+
 	buttons := container.NewVBox()
 	btnCopy := widget.NewButton("Copy", func() {
 		if err := model.CopyCommand(model.SelectedCard(), model.SelectedBlockIndex()); err != nil {
