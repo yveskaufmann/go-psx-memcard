@@ -12,7 +12,8 @@ import (
 // in one container clears the selection in its sibling container
 func TestBlockContainer_SelectBlock_ClearsSiblingSelection(t *testing.T) {
 	// Initialize test app
-	_ = test.NewTempApp(t)
+	app := test.NewTempApp(t)
+	_ = app // Ensure app is available for test isolation
 
 	// Create two block containers (simulating left and right memory cards)
 	leftBinding := binding.NewUntypedList()
@@ -55,7 +56,8 @@ func TestBlockContainer_SelectBlock_ClearsSiblingSelection(t *testing.T) {
 // TestBlockContainer_ClearSelection tests that ClearSelection properly clears all selections
 func TestBlockContainer_ClearSelection(t *testing.T) {
 	// Initialize test app
-	_ = test.NewTempApp(t)
+	app := test.NewTempApp(t)
+	_ = app // Ensure app is available for test isolation
 
 	binding := binding.NewUntypedList()
 	container := NewBlockContainer(memcard.MemoryCardLeft, binding)
@@ -81,7 +83,8 @@ func TestBlockContainer_ClearSelection(t *testing.T) {
 // within the same container clears the previous selection
 func TestBlockContainer_SelectBlock_WithinSameContainer(t *testing.T) {
 	// Initialize test app
-	_ = test.NewTempApp(t)
+	app := test.NewTempApp(t)
+	_ = app // Ensure app is available for test isolation
 
 	binding := binding.NewUntypedList()
 	container := NewBlockContainer(memcard.MemoryCardLeft, binding)
