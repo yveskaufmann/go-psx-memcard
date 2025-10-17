@@ -15,11 +15,10 @@ type BlockSelector interface {
 }
 type BlockContainer struct {
 	widget.BaseWidget
-	blocks               []*blockView
-	blockBinding         binding.UntypedList
-	selectedBlockIndexes []int
-	onBlockSelected      func(blockIndex int)
-	siblingContainer     *BlockContainer
+	blocks       []*blockView
+	blockBinding binding.UntypedList
+	// selectedBlockIndexes removed - selection state is now managed by the ViewModel
+	onBlockSelected func(blockIndex int)
 }
 
 func NewBlockContainer(cardId memcard.MemoryCardID, blockBinding binding.UntypedList) *BlockContainer {
@@ -52,10 +51,6 @@ func (b *BlockContainer) CreateRenderer() fyne.WidgetRenderer {
 
 func (b *BlockContainer) SetOnBlockSelected(callback func(blockIndex int)) {
 	b.onBlockSelected = callback
-}
-
-func (b *BlockContainer) SetSiblingContainer(sibling *BlockContainer) {
-	b.siblingContainer = sibling
 }
 
 func (b *BlockContainer) Refresh() {
@@ -107,23 +102,11 @@ func (b *BlockContainer) SelectBlock(idx int) {
 		return
 	}
 
-	// Clear selections in the sibling container first
-	if b.siblingContainer != nil {
-		b.siblingContainer.ClearSelection()
-	}
-
-	if len(b.selectedBlockIndexes) > 0 {
-		for _, selectedBlockIdx := range b.selectedBlockIndexes {
-			block := b.blocks[selectedBlockIdx]
-			block.Unselect()
-		}
-	}
-
 	block := b.blocks[idx]
 	if block.Selected() {
 		return
 	}
-	b.selectedBlockIndexes = []int{idx}
+	
 	if b.onBlockSelected != nil {
 		b.onBlockSelected(idx)
 	}
@@ -141,26 +124,18 @@ func (b *BlockContainer) UnselectBlock(idx int) {
 	}
 	block.Unselect()
 
-	b.selectedBlockIndexes = sliceFilter(b.selectedBlockIndexes, func(i int) bool {
-		return i != idx
-	})
-
 	if b.onBlockSelected != nil {
 		b.onBlockSelected(-1)
 	}
 }
 
-func (b *BlockContainer) ClearSelection() {
-	if len(b.selectedBlockIndexes) == 0 {
-		return
-	}
-
-	for _, selectedBlockIdx := range b.selectedBlockIndexes {
-		if selectedBlockIdx >= 0 && selectedBlockIdx < len(b.blocks) {
-			b.blocks[selectedBlockIdx].Unselect()
+// ClearAllSelections clears the visual selection state of all blocks in this container
+func (b *BlockContainer) ClearAllSelections() {
+	for _, block := range b.blocks {
+		if block.Selected() {
+			block.Unselect()
 		}
 	}
-	b.selectedBlockIndexes = []int{}
 }
 
 func (b *BlockContainer) SetBlockItem(idx int, item memcard.BlockItem) {
@@ -170,15 +145,6 @@ func (b *BlockContainer) SetBlockItem(idx int, item memcard.BlockItem) {
 
 	block := b.blocks[idx]
 	block.SetAnimation(item.Animation)
-}
-
-func sliceFilter(s []int, test func(int) bool) (ret []int) {
-	for _, v := range s {
-		if test(v) {
-			ret = append(ret, v)
-		}
-	}
-	return
 }
 
 type Item struct {

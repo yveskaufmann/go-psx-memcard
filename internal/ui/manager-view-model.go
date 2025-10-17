@@ -26,6 +26,10 @@ type ManagerWindowViewModel struct {
 
 	leftMemoryCard  *memcard.MemoryCard
 	rightMemoryCard *memcard.MemoryCard
+
+	// References to block containers for managing visual selection state
+	leftBlockContainer  *_ui_blocks.BlockContainer
+	rightBlockContainer *_ui_blocks.BlockContainer
 }
 
 func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
@@ -152,6 +156,13 @@ func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.Mem
 		return
 	}
 
+	// Clear visual selection in the other container
+	if cardId == memcard.MemoryCardLeft && vm.rightBlockContainer != nil {
+		vm.rightBlockContainer.ClearAllSelections()
+	} else if cardId == memcard.MemoryCardRight && vm.leftBlockContainer != nil {
+		vm.leftBlockContainer.ClearAllSelections()
+	}
+
 	vm.selectedCardId.Set(string(cardId))
 	vm.selectedBlockIndex.Set(blockIndex)
 
@@ -169,6 +180,11 @@ func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.Mem
 
 	vm.selectedSaveGameTitle.Set(blockItem.Title)
 
+}
+
+func (vm *ManagerWindowViewModel) SetBlockContainers(left, right *_ui_blocks.BlockContainer) {
+	vm.leftBlockContainer = left
+	vm.rightBlockContainer = right
 }
 
 func (vm *ManagerWindowViewModel) setDefaultSaveGameTitle(cardId memcard.MemoryCardID, blockIndex int) {
