@@ -18,6 +18,7 @@ type BlockContainer struct {
 	blocks               []*blockView
 	blockBinding         binding.UntypedList
 	selectedBlockIndexes []int
+	onBlockSelected      func(blockIndex int)
 }
 
 func NewBlockContainer(cardId memcard.MemoryCardID, blockBinding binding.UntypedList) *BlockContainer {
@@ -46,6 +47,10 @@ func (b *BlockContainer) CreateRenderer() fyne.WidgetRenderer {
 	}
 
 	return widget.NewSimpleRenderer(grid)
+}
+
+func (b *BlockContainer) SetOnBlockSelected(callback func(blockIndex int)) {
+	b.onBlockSelected = callback
 }
 
 func (b *BlockContainer) Refresh() {
@@ -109,6 +114,9 @@ func (b *BlockContainer) SelectBlock(idx int) {
 		return
 	}
 	b.selectedBlockIndexes = []int{idx}
+	if b.onBlockSelected != nil {
+		b.onBlockSelected(idx)
+	}
 
 }
 
@@ -127,6 +135,9 @@ func (b *BlockContainer) UnselectBlock(idx int) {
 		return i != idx
 	})
 
+	if b.onBlockSelected != nil {
+		b.onBlockSelected(-1)
+	}
 }
 
 func (b *BlockContainer) SetBlockItem(idx int, item memcard.BlockItem) {
