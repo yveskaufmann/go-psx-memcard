@@ -25,6 +25,10 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 	rootLayout := container.NewVBox()
 
 	leftMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardLeft, model.blocksLeft)
+	leftMemoryCardView.SetOnBlockSelected(func(blockIndex int) {
+		model.HandleBlockSelectionChanged(memcard.MemoryCardLeft, blockIndex)
+	})
+
 	leftMemoryCardFilePicker := filepicker.NewFilePicker(&window)
 	leftMemoryCardFilePicker.SetOnChanged(func(filePath string) {
 		model.LoadMemoryCardImage(filePath, memcard.MemoryCardLeft)
@@ -37,6 +41,10 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 	)
 
 	rightMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardRight, model.blocksRight)
+	rightMemoryCardView.SetOnBlockSelected(func(blockIndex int) {
+		model.HandleBlockSelectionChanged(memcard.MemoryCardRight, blockIndex)
+	})
+
 	rightMemoryCardFilePicker := filepicker.NewFilePicker(&window)
 	rightMemoryCardFilePicker.SetOnChanged(func(filePath string) {
 		model.LoadMemoryCardImage(filePath, memcard.MemoryCardRight)
