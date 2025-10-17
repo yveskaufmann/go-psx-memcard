@@ -2,7 +2,7 @@
 name: Bug Ticket
 about: Track a bug as ticket
 title: "[BUG] Concise summary of the issue (e.g., Search filter fails on mobile)"
-labels: ''
+labels: bug
 assignees: ''
 
 ---
