@@ -19,6 +19,7 @@ type BlockContainer struct {
 	blockBinding         binding.UntypedList
 	selectedBlockIndexes []int
 	onBlockSelected      func(blockIndex int)
+	siblingContainer     *BlockContainer
 }
 
 func NewBlockContainer(cardId memcard.MemoryCardID, blockBinding binding.UntypedList) *BlockContainer {
@@ -51,6 +52,10 @@ func (b *BlockContainer) CreateRenderer() fyne.WidgetRenderer {
 
 func (b *BlockContainer) SetOnBlockSelected(callback func(blockIndex int)) {
 	b.onBlockSelected = callback
+}
+
+func (b *BlockContainer) SetSiblingContainer(sibling *BlockContainer) {
+	b.siblingContainer = sibling
 }
 
 func (b *BlockContainer) Refresh() {
@@ -102,6 +107,11 @@ func (b *BlockContainer) SelectBlock(idx int) {
 		return
 	}
 
+	// Clear selections in the sibling container first
+	if b.siblingContainer != nil {
+		b.siblingContainer.ClearSelection()
+	}
+
 	if len(b.selectedBlockIndexes) > 0 {
 		for _, selectedBlockIdx := range b.selectedBlockIndexes {
 			block := b.blocks[selectedBlockIdx]
@@ -138,6 +148,19 @@ func (b *BlockContainer) UnselectBlock(idx int) {
 	if b.onBlockSelected != nil {
 		b.onBlockSelected(-1)
 	}
+}
+
+func (b *BlockContainer) ClearSelection() {
+	if len(b.selectedBlockIndexes) == 0 {
+		return
+	}
+
+	for _, selectedBlockIdx := range b.selectedBlockIndexes {
+		if selectedBlockIdx >= 0 && selectedBlockIdx < len(b.blocks) {
+			b.blocks[selectedBlockIdx].Unselect()
+		}
+	}
+	b.selectedBlockIndexes = []int{}
 }
 
 func (b *BlockContainer) SetBlockItem(idx int, item memcard.BlockItem) {
