@@ -11,6 +11,8 @@ import (
 	"fyne.io/fyne/v2/dialog"
 )
 
+const NoBlockSelected = -1
+
 type ManagerWindowViewModel struct {
 	window fyne.Window
 
@@ -36,7 +38,7 @@ func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
 		selectedSaveGameTitle: binding.NewString(),
 	}
 
-	win.selectedBlockIndex.Set(-1)
+	win.selectedBlockIndex.Set(NoBlockSelected)
 	win.selectedCardId.Set("")
 	win.selectedSaveGameTitle.Set("")
 
@@ -144,7 +146,7 @@ func (vm *ManagerWindowViewModel) SelectedCard() memcard.MemoryCardID {
 
 func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.MemoryCardID, blockIndex int) {
 	if blockIndex < 0 {
-		vm.selectedBlockIndex.Set(-1)
+		vm.selectedBlockIndex.Set(NoBlockSelected)
 		vm.selectedCardId.Set("")
 		vm.selectedSaveGameTitle.Set("")
 		return
