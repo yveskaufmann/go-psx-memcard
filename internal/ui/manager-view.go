@@ -52,17 +52,12 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 		model.CopyCommand(memcard.MemoryCardLeft, model.SelectedBlockIndex())
 	})
 
-	btnCopyAll := widget.NewButton("Copy All", func() {
-		model.CopyAllCommand(memcard.MemoryCardLeft)
-	})
-
 	btnDelete := widget.NewButton("Delete", func() {
-		model.DeleteCommand(memcard.MemoryCardRight, model.SelectedBlockIndex())
+		model.DeleteCommand(model.leftMemoryCard, model.SelectedBlockIndex())
 	})
 
 	buttons.Add(layout.NewSpacer())
 	buttons.Add(btnCopy)
-	buttons.Add(btnCopyAll)
 	buttons.Add(btnDelete)
 	buttons.Add(layout.NewSpacer())
 

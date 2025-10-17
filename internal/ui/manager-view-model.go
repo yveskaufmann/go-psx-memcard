@@ -21,6 +21,9 @@ type ManagerWindowViewModel struct {
 
 	blocksLeft  binding.UntypedList
 	blocksRight binding.UntypedList
+
+	leftMemoryCard  *memcard.MemoryCard
+	rightMemoryCard *memcard.MemoryCard
 }
 
 func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
@@ -52,8 +55,10 @@ func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId 
 	var blockBindingList binding.UntypedList
 	if memoryCardId == memcard.MemoryCardLeft {
 		blockBindingList = vm.blocksLeft
+		vm.leftMemoryCard = card
 	} else {
 		blockBindingList = vm.blocksRight
+		vm.rightMemoryCard = card
 	}
 
 	bindings := []any{}
@@ -73,12 +78,27 @@ func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId 
 }
 
 func (vm *ManagerWindowViewModel) CopyCommand(source memcard.MemoryCardID, blockIndex int) {
+	var card *memcard.MemoryCard
+	if source == memcard.MemoryCardLeft {
+		card = vm.leftMemoryCard
+	} else {
+		card = vm.rightMemoryCard
+	}
+
+	if card == nil {
+		dialog.ShowError(fmt.Errorf("no memory card loaded for card %s", source), vm.window)
+		return
+	}
+
+	if err := card.CopyBlockTo(blockIndex, card); err != nil {
+		dialog.ShowError(err, vm.window)
+	}
 }
 
-func (vm *ManagerWindowViewModel) CopyAllCommand(source memcard.MemoryCardID) {
-}
-
-func (vm *ManagerWindowViewModel) DeleteCommand(source memcard.MemoryCardID, blockIndex int) {
+func (vm *ManagerWindowViewModel) DeleteCommand(source *memcard.MemoryCard, blockIndex int) {
+	if err := source.DeleteBlockFrom(blockIndex, source); err != nil {
+		dialog.ShowError(err, vm.window)
+	}
 }
 
 func (vm *ManagerWindowViewModel) SelectedBlockIndex() int {
