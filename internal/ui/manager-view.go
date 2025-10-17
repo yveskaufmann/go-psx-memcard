@@ -6,6 +6,7 @@ import (
 	"com.yv35.memcard/internal/ui/filepicker"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
@@ -49,11 +50,15 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 
 	buttons := container.NewVBox()
 	btnCopy := widget.NewButton("Copy", func() {
-		model.CopyCommand(memcard.MemoryCardLeft, model.SelectedBlockIndex())
+		if err := model.CopyCommand(model.SelectedCard(), model.SelectedBlockIndex()); err != nil {
+			dialog.ShowError(err, window)
+		}
 	})
 
 	btnDelete := widget.NewButton("Delete", func() {
-		model.DeleteCommand(model.leftMemoryCard, model.SelectedBlockIndex())
+		if err := model.DeleteCommand(model.SelectedCard(), model.SelectedBlockIndex()); err != nil {
+			dialog.ShowError(err, window)
+		}
 	})
 
 	buttons.Add(layout.NewSpacer())
