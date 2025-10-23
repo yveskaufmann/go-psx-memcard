@@ -7,25 +7,35 @@ import (
 )
 
 type BlockModelView struct {
-	Index         int
-	CardId        memcard.MemoryCardID
-	Selected      binding.Bool
-	Allocated     binding.Bool
-	GameTitle     binding.String                         // binding to string
-	Animation     binding.Item[animatedsprite.Animation] // binding to animatedsprite.Animation
-	blockSelector BlockSelector
+	Index          int
+	CardId         memcard.MemoryCardID
+	Selected       binding.Bool
+	Allocated      binding.Bool
+	GameTitle      binding.String                         // binding to string
+	Animation      binding.Item[animatedsprite.Animation] // binding to animatedsprite.Animation
+	blockSelection *SelectionViewModel
 }
 
-func NewBlockModelView(idx int, cardId memcard.MemoryCardID, blockSelector BlockSelector) BlockModelView {
-	return BlockModelView{
-		Index:         idx,
-		CardId:        cardId,
-		Selected:      binding.NewBool(),
-		blockSelector: blockSelector,
-		Allocated:     binding.NewBool(),
-		GameTitle:     binding.NewString(),
-		Animation:     binding.NewItem((func(a, b animatedsprite.Animation) bool { return len(a.Frames) == len(b.Frames) })),
+func NewBlockModelView(idx int, cardId memcard.MemoryCardID, blockSelector *SelectionViewModel) *BlockModelView {
+
+	model := &BlockModelView{
+		Index:          idx,
+		CardId:         cardId,
+		Selected:       binding.NewBool(),
+		blockSelection: blockSelector,
+		Allocated:      binding.NewBool(),
+		GameTitle:      binding.NewString(),
+		Animation:      binding.NewItem((func(a, b animatedsprite.Animation) bool { return len(a.Frames) == len(b.Frames) })),
 	}
+
+	blockSelector.AddListener(NewSelectionChangedListener(model.handleSelectionChanged))
+
+	return model
+}
+
+func (b *BlockModelView) handleSelectionChanged(cardID memcard.MemoryCardID, blockIndex int) {
+	isCurrentBlockSelected := (cardID == b.CardId) && (blockIndex == b.Index)
+	b.Selected.Set(isCurrentBlockSelected)
 }
 
 func (b *BlockModelView) IsSelected() bool {
@@ -41,18 +51,13 @@ func (b *BlockModelView) ToggleSelect() {
 	selected := b.IsSelected()
 
 	if selected {
-		b.blockSelector.UnselectBlock(b.Index)
+		b.blockSelection.UnselectBlock(b.CardId, b.Index)
 	} else {
-		b.blockSelector.SelectBlock(b.Index)
+		b.blockSelection.SelectBlock(b.CardId, b.Index)
 	}
 
-	b.Selected.Set(!selected)
 }
 
 func (b *BlockModelView) UnSelect() {
-	if !b.IsSelected() {
-		return
-	}
-	b.Selected.Set(false)
-	b.blockSelector.UnselectBlock(b.Index)
+	b.blockSelection.ClearSelection()
 }
