@@ -24,10 +24,8 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 
 	rootLayout := container.NewVBox()
 
-	leftMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardLeft, model.blocksLeft)
-	leftMemoryCardView.SetOnBlockSelected(func(blockIndex int) {
-		model.HandleBlockSelectionChanged(memcard.MemoryCardLeft, blockIndex)
-	})
+	leftMemoryCardView := blocks.NewContainer(memcard.MemoryCardLeft, model.blocksLeft, model.selection)
+	leftMemoryCardView.SetOnBlockSelected(model.HandleBlockSelectionChanged)
 
 	leftMemoryCardFilePicker := filepicker.NewFilePicker(&window)
 	leftMemoryCardFilePicker.SetOnChanged(func(filePath string) {
@@ -40,10 +38,8 @@ func NewManagerWindowView(window fyne.Window) *ManagerWindowView {
 		leftMemoryCardView,
 	)
 
-	rightMemoryCardView := blocks.NewBlockContainer(memcard.MemoryCardRight, model.blocksRight)
-	rightMemoryCardView.SetOnBlockSelected(func(blockIndex int) {
-		model.HandleBlockSelectionChanged(memcard.MemoryCardRight, blockIndex)
-	})
+	rightMemoryCardView := blocks.NewContainer(memcard.MemoryCardRight, model.blocksRight, model.selection)
+	rightMemoryCardView.SetOnBlockSelected(model.HandleBlockSelectionChanged)
 
 	rightMemoryCardFilePicker := filepicker.NewFilePicker(&window)
 	rightMemoryCardFilePicker.SetOnChanged(func(filePath string) {

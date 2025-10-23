@@ -16,8 +16,7 @@ const NoBlockSelected = -1
 type ManagerWindowViewModel struct {
 	window fyne.Window
 
-	selectedBlockIndex binding.Int
-	selectedCardId     binding.String
+	selection *_ui_blocks.SelectionViewModel
 
 	selectedSaveGameTitle binding.String
 
@@ -31,18 +30,19 @@ type ManagerWindowViewModel struct {
 func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
 	win := &ManagerWindowViewModel{
 		window:                window,
-		selectedBlockIndex:    binding.NewInt(),
-		selectedCardId:        binding.NewString(),
 		blocksLeft:            binding.NewUntypedList(),
 		blocksRight:           binding.NewUntypedList(),
 		selectedSaveGameTitle: binding.NewString(),
+		selection:             _ui_blocks.NewBlockSelectionViewModel(),
 	}
 
-	win.selectedBlockIndex.Set(NoBlockSelected)
-	win.selectedCardId.Set("")
 	win.selectedSaveGameTitle.Set("")
 
 	return win
+}
+
+func (vm *ManagerWindowViewModel) SelectionViewModel() *_ui_blocks.SelectionViewModel {
+	return vm.selection
 }
 
 func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId memcard.MemoryCardID) {
@@ -128,33 +128,14 @@ func (vm *ManagerWindowViewModel) DeleteCommand(sourceCardId memcard.MemoryCardI
 }
 
 func (vm *ManagerWindowViewModel) SelectedBlockIndex() int {
-	val, err := vm.selectedBlockIndex.Get()
-	if err != nil {
-		return -1
-	}
-	return val
+	return vm.selection.BlockIndex()
 }
 
 func (vm *ManagerWindowViewModel) SelectedCard() memcard.MemoryCardID {
-	val, err := vm.selectedCardId.Get()
-	if err != nil {
-		return ""
-	}
-	return memcard.MemoryCardID(val)
-
+	return vm.selection.CardId()
 }
 
 func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.MemoryCardID, blockIndex int) {
-	if blockIndex < 0 {
-		vm.selectedBlockIndex.Set(NoBlockSelected)
-		vm.selectedCardId.Set("")
-		vm.selectedSaveGameTitle.Set("")
-		return
-	}
-
-	vm.selectedCardId.Set(string(cardId))
-	vm.selectedBlockIndex.Set(blockIndex)
-
 	card := vm.getMemoryCardById(cardId)
 	if card == nil {
 		vm.setDefaultSaveGameTitle(cardId, blockIndex)
