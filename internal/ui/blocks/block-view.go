@@ -22,15 +22,13 @@ var (
 
 type blockView struct {
 	widget.BaseWidget
-	model         BlockModelView
+	model         *BlockModelView
 	container     *fyne.Container
 	block         *canvas.Rectangle
 	iconContainer *fyne.Container
 }
 
-func NewBlockView(idx int, cardId memcard.MemoryCardID, blockSelector BlockSelector) *blockView {
-
-	model := NewBlockModelView(idx, cardId, blockSelector)
+func NewBlockView(idx int, cardId memcard.MemoryCardID, model *BlockModelView) *blockView {
 
 	block := canvas.NewRectangle(FILL_COLOR)
 	block.StrokeColor = UNSELECTED_BORDER_COLOR
@@ -114,24 +112,8 @@ func (v *blockView) setupIconAnimation() {
 	}))
 }
 
-func (v *blockView) Selected() bool {
-	return v.model.IsSelected()
-}
-
-func (v *blockView) Select() {
-	v.model.ToggleSelect()
-}
-
-func (v *blockView) Unselect() {
-	v.model.UnSelect()
-}
-
 func (v *blockView) Tapped(ev *fyne.PointEvent) {
 	v.model.ToggleSelect()
-}
-
-func (v *blockView) SetAnimation(animation animatedsprite.Animation) {
-	v.model.Animation.Set(animation)
 }
 
 func (v *blockView) CreateRenderer() fyne.WidgetRenderer {
