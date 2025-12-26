@@ -124,6 +124,37 @@ func (vm *ManagerWindowViewModel) DeleteCommand(sourceCardId memcard.MemoryCardI
 	if err := card.DeleteBlockFrom(blockIndex); err != nil {
 		return err
 	}
+
+	// TODO: Have a method that refresh the bindings for all blocks based on the changed memory card
+	var blockBindingList binding.UntypedList
+	if sourceCardId == memcard.MemoryCardLeft {
+		blockBindingList = vm.blocksLeft
+		vm.leftMemoryCard = card
+	} else {
+		blockBindingList = vm.blocksRight
+		vm.rightMemoryCard = card
+	}
+
+	blocks, err := card.ListBlocks()
+	if err != nil {
+		dialog.ShowError(err, vm.window)
+		return err
+	}
+
+	bindings := []any{}
+	for idx, block := range blocks {
+
+		blockItem := _ui_blocks.Item{
+			Index:     idx,
+			Title:     block.Title,
+			Animation: block.Animation,
+			Used:      block.Title != "",
+		}
+
+		bindings = append(bindings, blockItem)
+	}
+
+	blockBindingList.Set(bindings)
 	return nil
 }
 

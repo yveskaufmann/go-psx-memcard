@@ -52,6 +52,15 @@ type HeaderFrame struct {
 
 type FileName [21]byte
 
+func NewEmptyFileName() FileName {
+	// TODO: Check what are the correct bytes for an empty filename
+	var fn FileName
+	for i := range fn {
+		fn[i] = 0x0 // fill with null bytes
+	}
+	return fn
+}
+
 func (f *FileName) Region() string {
 	regionCode := string(f[0:2])
 
@@ -100,6 +109,20 @@ type Block struct {
 	TitleFrame BlockTitleFrame
 	IconFrames [3]IconBitmapFrame
 	Data       [60]DataFrame
+}
+
+func (b *Block) CleanBlock() {
+	var emptyTitleFrame BlockTitleFrame
+	var emptyIconFrame IconBitmapFrame
+	var emptyDataFrame DataFrame
+
+	b.TitleFrame = emptyTitleFrame
+	for i := range b.IconFrames {
+		b.IconFrames[i] = emptyIconFrame
+	}
+	for i := range b.Data {
+		b.Data[i] = emptyDataFrame
+	}
 }
 
 type BlockTitleFrame struct {
