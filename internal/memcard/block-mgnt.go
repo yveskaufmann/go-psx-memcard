@@ -26,6 +26,27 @@ func (mc *MemoryCard) FindFreeBlock() (int, bool) {
 	return -1, false
 }
 
+// CountBlocks returns the total, used, and free block counts for the memory card.
+func (mc *MemoryCard) CountBlocks() (total, used, free int) {
+	total = NumBlocks
+	used = 0
+	free = 0
+
+	for i := 0; i < NumBlocks; i++ {
+		state := mc.DirectoryFrames[i].BlockAllocationState
+		if state == BlockAllocationStateFreeFresh ||
+			state == BlockAllocationStateFreeDeletedFirst ||
+			state == BlockAllocationStateFreeDeletedMiddle ||
+			state == BlockAllocationStateFreeDeletedLast {
+			free++
+		} else {
+			used++
+		}
+	}
+
+	return total, used, free
+}
+
 // CopyBlockTo copies a block from the source memory card to the target memory card.
 // It finds a free block on the target card, copies the block data and directory frame,
 // and updates the allocation state to indicate it's a first-or-only block (0x51).
