@@ -216,15 +216,21 @@ func (vm *ManagerWindowViewModel) SelectedCard() memcard.MemoryCardID {
 }
 
 func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.MemoryCardID, blockIndex int) {
+	// Clear title if no block is selected
+	if blockIndex == NoBlockSelected || cardId == "" {
+		vm.selectedSaveGameTitle.Set("")
+		return
+	}
+
 	card := vm.getMemoryCardById(cardId)
 	if card == nil {
-		vm.setDefaultSaveGameTitle(cardId, blockIndex)
+		vm.selectedSaveGameTitle.Set("")
 		return
 	}
 
 	blockItem, err := card.GetBlock(blockIndex)
 	if err != nil || blockItem == nil {
-		vm.setDefaultSaveGameTitle(cardId, blockIndex)
+		vm.selectedSaveGameTitle.Set("")
 		return
 	}
 
@@ -234,4 +240,14 @@ func (vm *ManagerWindowViewModel) HandleBlockSelectionChanged(cardId memcard.Mem
 
 func (vm *ManagerWindowViewModel) setDefaultSaveGameTitle(cardId memcard.MemoryCardID, blockIndex int) {
 	vm.selectedSaveGameTitle.Set(fmt.Sprintf("Card %s - Block %d", cardId, blockIndex))
+}
+
+// GetBlockStatistics returns the total, used, and free block counts for the specified memory card.
+// Returns (0, 0, 0) if the card is not loaded.
+func (vm *ManagerWindowViewModel) GetBlockStatistics(cardId memcard.MemoryCardID) (total, used, free int) {
+	card := vm.getMemoryCardById(cardId)
+	if card == nil {
+		return 0, 0, 0
+	}
+	return card.CountBlocks()
 }
