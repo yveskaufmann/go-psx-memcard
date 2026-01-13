@@ -25,6 +25,9 @@ type ManagerWindowViewModel struct {
 
 	leftMemoryCard  *memcard.MemoryCard
 	rightMemoryCard *memcard.MemoryCard
+
+	leftMemoryCardPath  string
+	rightMemoryCardPath string
 }
 
 func NewManagerWindowViewModel(window fyne.Window) *ManagerWindowViewModel {
@@ -64,9 +67,11 @@ func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId 
 	if memoryCardId == memcard.MemoryCardLeft {
 		blockBindingList = vm.blocksLeft
 		vm.leftMemoryCard = card
+		vm.leftMemoryCardPath = path
 	} else {
 		blockBindingList = vm.blocksRight
 		vm.rightMemoryCard = card
+		vm.rightMemoryCardPath = path
 	}
 
 	bindings := []any{}
@@ -92,19 +97,53 @@ func (vm *ManagerWindowViewModel) getMemoryCardById(cardId memcard.MemoryCardID)
 	return vm.rightMemoryCard
 }
 
+func (vm *ManagerWindowViewModel) GetOppositeMemoryCardId(cardId memcard.MemoryCardID) memcard.MemoryCardID {
+	if cardId == memcard.MemoryCardLeft {
+		return memcard.MemoryCardRight
+	}
+	return memcard.MemoryCardLeft
+}
+
+func (vm *ManagerWindowViewModel) GetMemoryCardPathById(cardId memcard.MemoryCardID) string {
+	if cardId == memcard.MemoryCardLeft {
+		return vm.leftMemoryCardPath
+	}
+	return vm.rightMemoryCardPath
+}
+
 func (vm *ManagerWindowViewModel) CopyCommand(sourceCardId memcard.MemoryCardID, blockIndex int) error {
-	card := vm.getMemoryCardById(sourceCardId)
+	sourceCard := vm.getMemoryCardById(sourceCardId)
 
 	if blockIndex < 0 || blockIndex >= memcard.NumBlocks {
 		return fmt.Errorf("cannot copy block without selecting a block")
 	}
 
-	if card == nil {
+	if sourceCard == nil {
 		return fmt.Errorf("cannot copy block without loading a memory card \"%s\"", sourceCardId)
 	}
 
-	if err := card.CopyBlockTo(blockIndex, card); err != nil {
-		return err
+	// Get the target card (opposite card)
+	targetCardId := vm.GetOppositeMemoryCardId(sourceCardId)
+	targetCard := vm.getMemoryCardById(targetCardId)
+
+	if targetCard == nil {
+		return fmt.Errorf("cannot copy block: target memory card \"%s\" is not loaded", targetCardId)
+	}
+
+	// Copy the block to the target card
+	if err := sourceCard.CopyBlockTo(blockIndex, targetCard); err != nil {
+		return fmt.Errorf("failed to copy block: %w", err)
+	}
+
+	// Write the target card to disk
+	targetCardPath := vm.GetMemoryCardPathById(targetCardId)
+	if err := targetCard.Write(targetCardPath); err != nil {
+		return fmt.Errorf("failed to write target memory card: %w", err)
+	}
+
+	// Refresh the target card bindings to show the new block
+	if err := vm.RefreshCardBindings(targetCardId); err != nil {
+		return fmt.Errorf("failed to refresh target card bindings: %w", err)
 	}
 
 	return nil
@@ -125,14 +164,24 @@ func (vm *ManagerWindowViewModel) DeleteCommand(sourceCardId memcard.MemoryCardI
 		return err
 	}
 
+	vm.RefreshCardBindings(sourceCardId)
+
+	return card.Write(vm.GetMemoryCardPathById(sourceCardId))
+}
+
+func (vm *ManagerWindowViewModel) RefreshCardBindings(sourceCardId memcard.MemoryCardID) error {
+
+	card := vm.getMemoryCardById(sourceCardId)
+	if card == nil {
+		return fmt.Errorf("cannot refresh bindings without loading a memory card \"%s\"", sourceCardId)
+	}
+
 	// TODO: Have a method that refresh the bindings for all blocks based on the changed memory card
 	var blockBindingList binding.UntypedList
 	if sourceCardId == memcard.MemoryCardLeft {
 		blockBindingList = vm.blocksLeft
-		vm.leftMemoryCard = card
 	} else {
 		blockBindingList = vm.blocksRight
-		vm.rightMemoryCard = card
 	}
 
 	blocks, err := card.ListBlocks()
