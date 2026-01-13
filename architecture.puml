@@ -1,0 +1,67 @@
+@startuml PSX_Memory_Card_Manager_C4
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title C4 Model - PSX Memory Card Manager
+
+Person(user, "User", "Wants to manage PlayStation memory card files")
+
+System_Boundary(psx_memcard_manager, "PSX Memory Card Manager") {
+    Container(ui_app, "UI Application", "Go, Fyne", "Desktop GUI application for managing PSX memory cards")
+
+    Container_Boundary(ui_layer, "UI Layer") {
+        Component(manager_view, "ManagerWindowView", "Go, Fyne", "Main window view displaying two memory card slots")
+        Component(blocks_container, "BlocksContainer", "Go, Fyne", "Displays memory card blocks in a grid")
+        Component(block_view, "BlockView", "Go, Fyne", "Individual block view with animated icon")
+        Component(file_picker, "FilePicker", "Go, Fyne", "File selection dialog for memory card files")
+        Component(animated_sprite, "AnimatedSprite", "Go, Fyne", "Renders animated save game icons")
+    }
+
+    Container_Boundary(viewmodel_layer, "ViewModel Layer") {
+        Component(manager_vm, "ManagerWindowViewModel", "Go", "Manages application state and business logic")
+        Component(blocks_vm, "BlocksContainerViewModel", "Go", "Manages block display state")
+        Component(block_vm, "BlockViewModel", "Go", "Manages individual block state")
+        Component(selection_vm, "SelectionViewModel", "Go", "Manages block selection state")
+        Component(filepicker_vm, "FilePickerViewModel", "Go", "Manages file picker state")
+    }
+
+    Container_Boundary(domain_layer, "Domain Layer") {
+        Component(memcard, "MemoryCard", "Go", "Core memory card data structure and operations")
+        Component(memcard_reader, "MemoryCardReader", "Go", "Reads memory card files from disk")
+        Component(memcard_writer, "MemoryCardWriter", "Go", "Writes memory card files to disk")
+        Component(block_mgmt, "BlockManagement", "Go", "Block copy/delete operations")
+        Component(icon_decoder, "IconDecoder", "Go", "Decodes PSX icon bitmaps to images")
+        Component(sjis_string, "ShiftJISString", "Go", "Handles Shift-JIS encoding/decoding")
+    }
+
+    Container(di_container, "Dependency Injection", "Go, uber/dig", "Dependency injection container")
+}
+
+System_Ext(file_system, "File System", "OS file system")
+
+Rel(user, ui_app, "Uses", "GUI")
+Rel(ui_app, manager_view, "Contains")
+Rel(manager_view, blocks_container, "Contains")
+Rel(manager_view, file_picker, "Contains")
+Rel(blocks_container, block_view, "Contains (15x)")
+Rel(block_view, animated_sprite, "Uses")
+Rel(manager_view, manager_vm, "Uses")
+Rel(blocks_container, blocks_vm, "Uses")
+Rel(block_view, block_vm, "Uses")
+Rel(blocks_vm, selection_vm, "Uses")
+Rel(file_picker, filepicker_vm, "Uses")
+Rel(manager_vm, memcard, "Uses")
+Rel(manager_vm, selection_vm, "Uses")
+Rel(memcard, memcard_reader, "Uses")
+Rel(memcard, memcard_writer, "Uses")
+Rel(memcard, block_mgmt, "Uses")
+Rel(memcard, icon_decoder, "Uses")
+Rel(memcard, sjis_string, "Uses")
+Rel(memcard_reader, file_system, "Reads from")
+Rel(memcard_writer, file_system, "Writes to")
+Rel(ui_app, di_container, "Uses")
+Rel(di_container, manager_view, "Provides")
+
+@enduml
