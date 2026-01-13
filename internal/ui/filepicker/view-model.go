@@ -1,6 +1,7 @@
 package filepicker
 
 import (
+	"com.yv35.memcard/internal/memcard"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
@@ -50,4 +51,29 @@ func (v *ViewModel) PickFileCommand() {
 		}
 	}
 
+}
+
+func (v *ViewModel) CreateNewFileCommand() {
+	currentPath, _ := v.FilePath.Get()
+	selectedPath, err := v.filePicker.SaveFile(currentPath)
+
+	if err != nil {
+		dialog.ShowError(err, fyne.CurrentApp().Driver().AllWindows()[0])
+		return
+	}
+
+	if selectedPath != "" {
+		// Create a new formatted memory card and write it to the selected path
+		card := memcard.NewFormattedMemoryCard()
+		if err := card.Write(selectedPath); err != nil {
+			dialog.ShowError(err, fyne.CurrentApp().Driver().AllWindows()[0])
+			return
+		}
+
+		// Set the file path and trigger the callback to load the new card
+		v.SetFilePath(selectedPath)
+		if v.OnChanged != nil {
+			v.OnChanged(selectedPath)
+		}
+	}
 }
