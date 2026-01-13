@@ -17,7 +17,7 @@ var (
 	SELECTED_BORDER_COLOR   = color.RGBA{R: 200, G: 100, B: 100, A: 255}
 	UNSELECTED_BORDER_COLOR = color.RGBA{R: 0, G: 0, B: 00, A: 60}
 	FILL_COLOR              = color.RGBA{R: 100, G: 100, B: 200, A: 255}
-	BLOCK_SIZE              = float32(64.0)
+	BLOCK_SIZE              = float32(96)
 )
 
 type blockView struct {
