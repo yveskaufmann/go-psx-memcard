@@ -14,6 +14,9 @@ type FilePickerService interface {
 	// PickFile opens a file dialog and returns the selected file path.
 	// If the initialPath is not empty, it will be used as the starting directory.
 	PickFile(initialPath string) (string, error)
+	// SaveFile opens a file save dialog and returns the selected file path.
+	// If the initialPath is not empty, it will be used as the starting directory.
+	SaveFile(initialPath string) (string, error)
 }
 
 func DetermineInitialLocation(currentPath string) string {
@@ -73,6 +76,51 @@ func (s *FyneFilePickerService) PickFile(initialPath string) (string, error) {
 		defer reader.Close()
 
 		path := reader.URI().Path()
+		if path != "" {
+			fc <- path
+		}
+	}, window)
+
+	fileDialog.SetLocation(lister)
+	fileDialog.Show()
+
+	select {
+	case filePath := <-fc:
+		return filePath, nil
+	case err := <-fe:
+		return "", err
+	}
+}
+
+func (s *FyneFilePickerService) SaveFile(initialPath string) (string, error) {
+	fc := make(chan string)
+	fe := make(chan error)
+
+	window := *s.window
+	if window == nil {
+		window = utils.GetPrimaryWindow()
+	}
+
+	uri := storage.NewFileURI(DetermineInitialLocation(initialPath))
+	lister, err := storage.ListerForURI(uri)
+	if err != nil {
+		dialog.ShowError(err, window)
+		return "", err
+	}
+
+	fileDialog := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
+		if err != nil {
+			fe <- err
+			return
+		}
+
+		if writer == nil {
+			return
+		}
+
+		defer writer.Close()
+
+		path := writer.URI().Path()
 		if path != "" {
 			fc <- path
 		}

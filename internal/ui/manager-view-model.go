@@ -49,7 +49,7 @@ func (vm *ManagerWindowViewModel) SelectionViewModel() *_ui_blocks.SelectionView
 }
 
 func (vm *ManagerWindowViewModel) LoadMemoryCardImage(path string, memoryCardId memcard.MemoryCardID) {
-
+	// Open the memory card file
 	card, err := memcard.Open(path)
 	if err != nil {
 		dialog.ShowError(err, vm.window)
