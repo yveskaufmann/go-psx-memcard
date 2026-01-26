@@ -1,0 +1,3 @@
+bin/ export-ignore
+screenshots/ export-ignore
+*.mcr linguist-generated=true
