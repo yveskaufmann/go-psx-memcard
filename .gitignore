@@ -1,2 +1,20 @@
 bin/
 __debug_bin*
+
+# Editor/OS
+.DS_Store
+.vscode/
+.idea/
+
+# Executables
+*.exe
+*.dll
+*.app
+
+# Logs and temp
+*.log
+tmp/
+
+# macOS
+*.dmg
+
