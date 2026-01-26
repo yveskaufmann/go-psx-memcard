@@ -1,3 +1,4 @@
+```instructions
 # Copilot Instructions: psx-memcard
 
 ## Overview
@@ -65,5 +66,7 @@
 - [Go Doc Comments](https://go.dev/doc/comment)
 - [Table-Driven Tests (Go Wiki)](https://github.com/golang/go/wiki/TableDrivenTests)
 - [EditorConfig](https://editorconfig.org/)
-- Internal: [CONTRIBUTING.md](../CONTRIBUTING.md)
-- Internal: [Agents Guide](agents.md)
+- Internal: [CONTRIBUTING.md](../../CONTRIBUTING.md)
+- Internal: [Agents Guide](../../.github/agents.md)
+
+``` 
