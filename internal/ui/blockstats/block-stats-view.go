@@ -103,15 +103,15 @@ func NewMemoryCardBlockStatsView(
 		B: 240,
 		A: 255,
 	})
-	
+
 	// Create a top border line
 	borderColor := color.RGBA{R: 180, G: 180, B: 180, A: 255} // Light gray border
 	topBorder := canvas.NewLine(borderColor)
 	topBorder.StrokeWidth = 1
-	
+
 	// Create a container with padding for better spacing
 	paddedContent := container.NewPadded(footerContent)
-	
+
 	// Create border container with top border line
 	borderedContent := container.NewBorder(
 		topBorder, // Top border line
@@ -120,7 +120,7 @@ func NewMemoryCardBlockStatsView(
 		nil,
 		paddedContent,
 	)
-	
+
 	// Stack background and bordered content
 	view.container = container.NewStack(
 		backgroundRect,
