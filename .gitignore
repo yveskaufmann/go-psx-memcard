@@ -1,5 +1,6 @@
 bin/
 __debug_bin*
+dist/
 
 # Editor/OS
 .DS_Store

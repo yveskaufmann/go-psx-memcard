@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=PSX Memory Card Manager
+Exec=/usr/local/bin/psx-memcard
+Icon=/home/yves/.local/share/pixmaps/com.yvka.psx.memcard.manager.png
+Keywords=fyne;Emulator;Playstation;MemoryCard;
+Comment=Manage PSX MemoryCard Images
+StartupNotify=true
+Categories=Utility;FileTools;GameTool;
+StartupWMClass=PSX Memory Card Manager
+Terminal=false
+Icon=com.yv35.PSX Memcard Manager
+

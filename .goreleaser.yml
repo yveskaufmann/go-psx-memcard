@@ -1,24 +1,79 @@
 project_name: psx-memcard
+version: 2
 
 builds:
-  - id: default
+  - id: psx-memcard
     main: ./main.go
     binary: psx-memcard
-    goos:
-      - linux
-      - windows
-      - darwin
-    goarch:
-      - amd64
-      - arm64
+
+    # We are prepareing for cross-compilation via Docker images,
+    # where the default is to build for linux/amd64, but
+    # we specify other targets via overrides.
+    goos: [linux]
+    goarch: [amd64]
+
     env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED=1
+
+    # Override C compiler per target for cross-compilation
+    overrides:
+      - goos: linux
+        goarch: amd64
+        env:
+          - CGO_ENABLED=1
+          - CC=x86_64-linux-gnu-gcc
+
+      - goos: linux
+        goarch: arm64
+        env:
+          - CGO_ENABLED=1
+          - CC=aarch64-linux-gnu-gcc
+
+      - goos: windows
+        goarch: amd64
+        env:
+          - CGO_ENABLED=1
+          - CC={{ if index .Env "GITHUB_ACTIONS" }}gcc{{ else }}x86_64-w64-mingw32-gcc{{ end }}
+          - CGO_LDFLAGS=-static
+
+      - goos: windows
+        goarch: arm64
+        env:
+          - CGO_ENABLED=1
+          - CC={{ if index .Env "GITHUB_ACTIONS" }}clang{{ else }}aarch64-w64-mingw32-gcc{{ end }}
+          - CGO_LDFLAGS=-static
+
+      - goos: darwin
+        goarch: arm64
+        env:
+          - CGO_ENABLED=1
+          - CC=clang
 
 archives:
   - id: default
-    format: tar.gz
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
     files:
-      - bin/*
+      - LICENSE
+      - README.md
+
+nfpms:
+  - id : deb
+    package_name: psx-memcard
+    file_name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    formats:
+      - deb
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/psx-memcard/
+      - src: README.md
+        dst: /usr/share/doc/psx-memcard/
+      - src: build/linux/share
+        dst: /usr/share
 
 changelog:
   use: git

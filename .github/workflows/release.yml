@@ -5,26 +5,120 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write
+
 jobs:
-  goreleaser:
-    runs-on: ubuntu-latest
+  build:
+    continue-on-error: ${{ matrix.experimental == true }}
+    name: Build psx-memcard ${{ matrix.goos }}-${{ matrix.goarch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+
+          - os: ubuntu-24.04-arm
+            goos: linux
+            goarch: arm64
+
+          - os: windows-latest
+            goos: windows
+            goarch: amd64
+            tlc-pkg: mingw-w64-x86_64-toolchain
+            tlc-bin: C:\msys64\mingw64\bin
+
+          - os: windows-11-arm
+            goos: windows
+            goarch: arm64
+            tlc-pkg: mingw-w64-clang-aarch64-toolchain
+            tlc-bin: C:\msys64\clangarm64\bin
+            experimental: true
+
+          - os: macos-latest
+            goos: darwin
+            goarch: arm64
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.24'
-      - name: Get dependencies
-        if: ${{ runner.os == 'Linux' }}
+
+      # Linux: Install dependencies (both amd64 and arm64 native runners)
+      - name: Install Linux dependencies
+        if: matrix.goos == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends bc clang lld libgl1-mesa-dev libwayland-dev libx11-dev libxkbcommon-dev xorg-dev xvfb language-pack-en
-          echo "CC=clang" >> "$GITHUB_ENV"
-          echo "CGO_LDFLAGS=-fuse-ld=lld" >> "$GITHUB_ENV"
-      - name: Run goreleaser
-        uses: goreleaser/goreleaser-action@v2
+          sudo apt-get install -y \
+            libgl1-mesa-dev \
+            xorg-dev \
+            libwayland-dev \
+            libxkbcommon-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxinerama-dev \
+            libxxf86vm-dev
+
+      - name: Install Windows Toolchain
+        if: matrix.goos == 'windows'
+        shell: pwsh
+        run: |
+          # Install yq for YAML processing
+          choco install yq llvm -y
+
+          # Add LLVM to PATH
+          if ("${{ matrix.goarch }}" -eq "amd64") {
+              "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          } else {
+            $llvmPath = "C:\Program Files\LLVM\bin"
+            if (Test-Path $llvmPath) {
+              $llvmPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            }
+          }
+
+      - name: Disable nfpms for non-linux builds
+        if: matrix.goos != 'linux'
+        shell: bash
+        run: |
+          yq 'del(.nfpms)' -i .goreleaser.yml
+
+
+      # Modify .goreleaser.yml to build only for this target
+      - name: Configure GoReleaser for target
+        shell: bash
+        run: |
+          yq '.builds[0].goos = [env(GOOS)] | .builds[0].goarch = [env(GOARCH)]' -i .goreleaser.yml
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+
+      # Build with GoReleaser (creates archives, checksums, .deb packages)
+      - name: Build with GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
-          version: latest
-          args: release --rm-dist
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --skip=publish,validate --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload artifacts to the existing GitHub release
+      - name: Upload artifacts to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.zip
+            dist/*.tar.gz
+            dist/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
