@@ -53,6 +53,5 @@
 
 ## References
 
-- [Agents Guide](.github/agents.md)
-- [Copilot Instructions](.github/copilot-instructions.md)
+- [Agent Instructions](AGENTS.md)
 - [SemVer](https://semver.org/)
