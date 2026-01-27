@@ -53,5 +53,5 @@
 
 ## References
 
-- [Agent.md](AGENTS.md) - Instructions for automated agents
+- [AGENTS.md](AGENTS.md) - Instructions for automated agents
 - [SemVer](https://semver.org/)
