@@ -1,6 +1,12 @@
 # PSX Memory Card Manager
 
+[![CI](https://github.com/yveskaufmann/go-psx-memcard/actions/workflows/ci.yml/badge.svg)](https://github.com/yveskaufmann/go-psx-memcard/actions)
+[![Release](https://img.shields.io/github/v/release/yveskaufmann/go-psx-memcard)](https://github.com/yveskaufmann/go-psx-memcard/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+
 A desktop application for managing PlayStation (PSX) memory card files, inspired by the classic PlayStation system menu memory card editor. Built with Go and Fyne UI framework.
+This is just a side hustle to better understand how the PlayStation memory card format works and to see how it feels to build desktop applications in Go.
 
 ![PSX Memory Card Manager](screenshots/ui-01.png)
 
@@ -77,6 +83,11 @@ make build
 ```bash
 ./bin/psx-memcard
 ```
+
+### Prebuilt binaries
+
+Prebuilt binaries are available on the Releases page. If you prefer to use a packaged binary instead of building locally, download the appropriate asset from the latest release: https://github.com/yveskaufmann/go-psx-memcard/releases
+
 
 ## Usage
 
