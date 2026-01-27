@@ -36,6 +36,7 @@ The goal of this project is to recreate the functionality of the PlayStation mem
 ## Screenshot
 
 The application provides a clean, intuitive interface with:
+
 - Two memory card slots (Card 1 and Card 2) displayed side-by-side
 - File pickers for each card with browse and create new card buttons
 - Block grids showing save game icons and allocation status
@@ -52,28 +53,42 @@ The application provides a clean, intuitive interface with:
 
 ### Building from Source
 
-1. Clone the repository:
+This section describes how to build the application from source code locally.
+Ensure you have Go (1.24 or later) installed and set up on your machine.
+
+#### 1. Clone the repository
+
+First, fetch the source code and move into the project root:
+
 ```bash
 git clone <repository-url>
 cd go-psx-memcard
 ```
 
-2. Install dependencies:
+#### 2. Install dependencies
+
+All dependencies are managed via Go modules. To download them, run:
+
 ```bash
 go mod download
 ```
 
-3. Build the application:
+#### 3. Build the application
+
+You can build the application using the Go command:
+
+ ```bash
+ go build -o bin/psx-memcard ./main.go
+ ```
+
+ Or use the Makefile:
+
 ```bash
-go build -o bin/psx-memcard ./main.go
+ make build
 ```
 
-Or use the Makefile:
-```bash
-make build
-```
+#### 4. Run the application
 
-4. Run the application:
 ```bash
 ./bin/psx-memcard
 ```
@@ -122,6 +137,7 @@ For detailed architecture documentation, see [architecture.md](architecture.md).
 ## Memory Card Format
 
 The application supports the standard PlayStation memory card format (`.mcr` files):
+
 - 128 KB total size (131,072 bytes)
 - 15 data blocks (8 KB each)
 - Header frames, directory frames, and block data
