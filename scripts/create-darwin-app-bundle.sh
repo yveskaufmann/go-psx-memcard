@@ -22,7 +22,7 @@ cp "$BINARY_PATH" "${APP_BUNDLE_DIR}/Contents/MacOS/${APP_NAME}"
 rm "${APP_BUNDLE_DIR}/Contents/MacOS/.gitkeep"
 
 # Sign the app bundle
-codesign --force --deep --sign - "${APP_NAME}.app"
+codesign --force --deep --sign - "dist/${APP_NAME}.app"
 
 (cd dist && zip -r "${APP_NAME}-${OS}-${ARCH}.app.zip" "${APP_NAME}.app")
 rm -rf "${APP_BUNDLE_DIR}"
