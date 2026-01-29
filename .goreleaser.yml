@@ -15,6 +15,11 @@ builds:
     env:
       - CGO_ENABLED=1
 
+    hooks:
+      post:
+        - cmd: ./scripts/create-darwin-app-bundle.sh {{ .Os }} {{ .Arch }} {{ .Path }}
+
+
     # Override C compiler per target for cross-compilation
     overrides:
       - goos: linux
@@ -45,6 +50,7 @@ builds:
 
       - goos: darwin
         goarch: arm64
+
         env:
           - CGO_ENABLED=1
           - CC=clang

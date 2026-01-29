@@ -1,12 +1,12 @@
 [Details]
   Icon = "Icon.png"
-  Name = "PSX Memory Card Manager"
+  Name = "PSX Memcard Manager<"
   ID = "com.yv35.PSXMemoryCardManager"
   Version = "0.0.1"
   Build = 4
 
 [LinuxAndBSD]
-  GenericName = "PSX Memory Card Manager"
+  GenericName = "PSX Memcard Manager"
   Categories = ["Utility","FileTools","GameTool"]
   Comment = "Manage PSX MemoryCard Images"
   Keywords = ["fyne", "Playstation", "MemoryCard"]
